@@ -1,0 +1,187 @@
+/* =============================================
+   js/db.js — LocalStorage database layer
+   ============================================= */
+
+'use strict';
+
+const DB = {
+  PREFIX: 'tq_',
+
+  get(key) {
+    try {
+      const raw = localStorage.getItem(this.PREFIX + key);
+      return raw ? JSON.parse(raw) : null;
+    } catch { return null; }
+  },
+
+  set(key, value) {
+    try {
+      localStorage.setItem(this.PREFIX + key, JSON.stringify(value));
+      return true;
+    } catch { return false; }
+  },
+
+  del(key) {
+    try { localStorage.removeItem(this.PREFIX + key); return true; }
+    catch { return false; }
+  },
+
+  // Users table
+  getUsers() { return this.get('users') || {}; },
+  saveUsers(users) { return this.set('users', users); },
+
+  getUser(uid) {
+    const users = this.getUsers();
+    return users[uid] || null;
+  },
+
+  saveUser(user) {
+    const users = this.getUsers();
+    users[user.uid] = user;
+    return this.saveUsers(users);
+  },
+
+  findUserByCredential(identifier) {
+    const users = this.getUsers();
+    return Object.values(users).find(
+      u => u.username === identifier || u.email === identifier
+    ) || null;
+  },
+
+  usernameExists(username) {
+    const users = this.getUsers();
+    return Object.values(users).some(u => u.username === username);
+  },
+
+  emailExists(email) {
+    const users = this.getUsers();
+    return Object.values(users).some(u => u.email === email);
+  },
+
+  // Session
+  getCurrentUid() { return this.get('currentUser'); },
+  setCurrentUid(uid) { return this.set('currentUser', uid); },
+  clearCurrentUid() { return this.del('currentUser'); },
+
+  // Theme
+  getTheme() { return this.get('theme') || 'dark'; },
+  setTheme(t) { return this.set('theme', t); },
+
+  // Create fresh user object
+  createUserObject({ uid, fname, lname, username, email, password, country }) {
+    return {
+      uid, fname, lname, username, email, password,
+      country:         country || 'Other',
+      bio:             '',
+      avatarColor:     0,
+      joined:          Date.now(),
+      lastPlay:        null,
+      streak:          0,
+      currentLevel:    1,
+      completedLevels: {},   // { "levelId_diff": stars }
+      scores:          [],   // [{ levelId, difficulty, wpm, accuracy, stars, date }]
+      keystrokes:      0,
+      bestWpm:         0,
+      totalAcc:        [],   // running array of accuracy values
+    };
+  },
+
+  // Seed demo user if it doesn't exist
+  seedDemoUser() {
+    if (this.findUserByCredential('demo')) return;
+    const user = this.createUserObject({
+      uid:      'demo_user',
+      fname:    'Demo',
+      lname:    'Player',
+      username: 'demo',
+      email:    'demo@typequest.app',
+      password: 'demo123',
+      country:  'Saudi Arabia',
+    });
+    user.bio          = 'Exploring the Quran through typing 📖';
+    user.streak       = 3;
+    user.lastPlay     = Date.now();
+    user.currentLevel = 5;
+    user.completedLevels = { '1_easy': 3, '2_easy': 2, '3_easy': 3, '4_medium': 2, '4_easy': 1 };
+    user.bestWpm      = 52;
+    user.keystrokes   = 3840;
+    user.totalAcc     = [88, 92, 90, 94, 87];
+    user.scores = [
+      { levelId:1, difficulty:'easy',   wpm:48, accuracy:92, stars:3, date: Date.now()-4*86400000 },
+      { levelId:2, difficulty:'easy',   wpm:45, accuracy:88, stars:2, date: Date.now()-3*86400000 },
+      { levelId:3, difficulty:'easy',   wpm:52, accuracy:94, stars:3, date: Date.now()-2*86400000 },
+      { levelId:4, difficulty:'medium', wpm:38, accuracy:87, stars:2, date: Date.now()-86400000   },
+      { levelId:4, difficulty:'easy',   wpm:46, accuracy:90, stars:2, date: Date.now()-3600000    },
+    ];
+    this.saveUser(user);
+  },
+
+  // Update user and persist
+  updateUser(uid, changes) {
+    const user = this.getUser(uid);
+    if (!user) return null;
+    Object.assign(user, changes);
+    this.saveUser(user);
+    return user;
+  },
+
+  // Record a completed session
+  recordScore(uid, { levelId, difficulty, wpm, accuracy, stars, keystrokes }) {
+    const user = this.getUser(uid);
+    if (!user) return null;
+
+    user.scores = user.scores || [];
+    user.scores.push({ levelId, difficulty, wpm, accuracy, stars, date: Date.now() });
+
+    user.completedLevels = user.completedLevels || {};
+    const key = `${levelId}_${difficulty}`;
+    user.completedLevels[key] = Math.max(user.completedLevels[key] || 0, stars);
+
+    user.bestWpm     = Math.max(user.bestWpm || 0, wpm);
+    user.totalAcc    = user.totalAcc || [];
+    user.totalAcc.push(accuracy);
+    user.keystrokes  = (user.keystrokes || 0) + keystrokes;
+    user.lastPlay    = Date.now();
+    if (levelId >= (user.currentLevel || 1)) {
+      user.currentLevel = levelId + 1;
+    }
+
+    // Streak logic
+    const todayStr    = new Date().toDateString();
+    const lastPlayStr = user.lastPlayDate || '';
+    const yesterStr   = new Date(Date.now() - 86400000).toDateString();
+    if (lastPlayStr === yesterStr) {
+      user.streak = (user.streak || 0) + 1;
+    } else if (lastPlayStr !== todayStr) {
+      user.streak = 1;
+    }
+    user.lastPlayDate = todayStr;
+
+    this.saveUser(user);
+    return user;
+  },
+
+  // Get leaderboard entries (real users only)
+  getLeaderboardEntries(difficulty = 'all') {
+    const users = this.getUsers();
+    return Object.values(users)
+      .filter(u => (u.scores || []).length > 0)
+      .map(u => {
+        const filtered = difficulty === 'all'
+          ? u.scores
+          : (u.scores || []).filter(s => s.difficulty === difficulty);
+        if (!filtered || !filtered.length) return null;
+        const bestWpm = Math.max(...filtered.map(s => s.wpm));
+        const avgAcc  = Math.round(filtered.reduce((a, s) => a + s.accuracy, 0) / filtered.length);
+        return {
+          uid:      u.uid,
+          name:     u.username || u.fname || 'Unknown',
+          country:  u.country || '🌍',
+          wpm:      bestWpm,
+          accuracy: avgAcc,
+          level:    u.currentLevel || 1,
+        };
+      })
+      .filter(Boolean);
+  },
+};

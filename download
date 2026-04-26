@@ -1,0 +1,119 @@
+/* =============================================
+   css/game.css — Game screen styles
+   ============================================= */
+
+/* ---- GAME CONTAINER ---- */
+.game-container {
+  max-width:860px; margin:0 auto;
+  padding:calc(var(--nav-h) + 1.5rem) 1.5rem 2rem;
+  display:flex; flex-direction:column; gap:1rem;
+  min-height:100vh;
+}
+
+/* ---- GAME TOP BAR ---- */
+.game-topbar {
+  display:grid; grid-template-columns:auto 1fr auto;
+  gap:1.25rem; align-items:center;
+}
+.game-level-title { font-family:var(--font-heading); font-size:1.05rem; color:var(--gold); }
+.game-badges { display:flex; gap:6px; margin-top:4px; flex-wrap:wrap; }
+.game-progress-wrap { display:flex; flex-direction:column; gap:5px; }
+.game-progress-labels { display:flex; justify-content:space-between; font-size:0.78rem; color:var(--text-muted); }
+.game-progress-bar { height:8px !important; }
+
+/* ---- TIMER RING ---- */
+.timer-ring {
+  position:relative; width:78px; height:78px; flex-shrink:0;
+}
+.timer-ring svg { transform:rotate(-90deg); }
+.timer-bg  { fill:none; stroke:rgba(255,255,255,0.08); stroke-width:5; }
+.timer-arc {
+  fill:none; stroke:var(--teal); stroke-width:5;
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s linear, stroke 0.5s ease;
+}
+.timer-text {
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-mono); font-size:1.1rem; font-weight:700;
+}
+.timer-ring.danger .timer-arc { stroke:var(--red); }
+.timer-ring.warn   .timer-arc { stroke:var(--yellow); }
+
+/* ---- LIVE STATS BAR ---- */
+.live-stats-bar {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.live-stat {
+  background:var(--bg-card); border:1px solid var(--border-soft);
+  border-radius:var(--radius-md); padding:0.75rem;
+  text-align:center; transition:var(--transition);
+}
+.live-stat:hover { border-color:var(--border); }
+.live-stat-val   { font-family:var(--font-mono); font-size:1.3rem; font-weight:700; line-height:1; }
+.live-stat-label { font-size:0.68rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px; margin-top:3px; }
+
+/* ---- TYPING CARD ---- */
+.typing-card {
+  padding:1.5rem;
+  display:flex; flex-direction:column; gap:0.75rem;
+  flex:1;
+}
+
+/* ---- ARABIC REFERENCE ---- */
+.arabic-ref {
+  font-family:var(--font-arabic);
+  font-size:1.45rem; line-height:2.2;
+  color:var(--text-muted); text-align:right;
+  direction:rtl;
+  padding-bottom:0.75rem;
+  border-bottom:1px solid var(--border-soft);
+  min-height:54px;
+}
+.verse-hint { color:var(--text-muted); font-size:0.8rem; font-style:italic; }
+
+/* ---- TYPING DISPLAY ---- */
+.typing-display {
+  font-size:1.25rem; line-height:2.2;
+  word-spacing:4px; letter-spacing:0.4px;
+  min-height:80px; user-select:none;
+}
+.t-char { display:inline; transition:color 0.08s; }
+.t-correct { color:var(--green); }
+.t-wrong   { color:var(--red); background:rgba(255,68,68,0.1); border-radius:2px; }
+.t-current { background:rgba(212,168,67,0.25); border-radius:2px; animation:cursorBlink 0.9s ease-in-out infinite; }
+.t-pending { color:var(--text-muted); }
+
+/* ---- TYPING INPUT ---- */
+.typing-input {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border-soft);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;
+  color:var(--text);
+  font-family:var(--font-body); font-size:1.05rem; font-weight:500;
+  resize:none; outline:none;
+  transition:var(--transition);
+  letter-spacing:0.3px; line-height:1.6;
+}
+.typing-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,168,67,0.1); }
+.typing-input:disabled { opacity:0.5; cursor:not-allowed; }
+
+/* ---- GAME CONTROLS ---- */
+.game-controls {
+  display:flex; justify-content:space-between; align-items:center;
+  flex-wrap:wrap; gap:10px;
+}
+.game-controls-left  { display:flex; gap:8px; flex-wrap:wrap; }
+.game-controls-right { display:flex; align-items:center; gap:10px; }
+
+/* ---- WPM METER ---- */
+.wpm-meter { display:flex; align-items:center; gap:8px; min-width:140px; }
+.wpm-label { font-size:0.72rem; color:var(--text-muted); flex-shrink:0; }
+.wpm-bar   { flex:1; height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; }
+.wpm-fill  { height:100%; border-radius:3px; transition:width 0.4s ease; background:linear-gradient(90deg,var(--teal),var(--gold)); }
+.wpm-value { font-family:var(--font-mono); font-size:0.78rem; color:var(--gold); flex-shrink:0; width:24px; text-align:right; }
+
+/* ---- PAUSE MODAL EXTRA ---- */
+.modal-pause-icon { font-size:3rem; margin-bottom:1rem; animation:pulse 2s ease-in-out infinite; }

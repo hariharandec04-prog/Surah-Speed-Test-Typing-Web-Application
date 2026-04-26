@@ -1,0 +1,90 @@
+/* =============================================
+   css/responsive.css — Mobile & breakpoints
+   ============================================= */
+
+@media (max-width: 900px) {
+  .dash-grid-2 { grid-template-columns:1fr; }
+  .lb-toolbar  { flex-direction:column; align-items:flex-start; }
+}
+
+@media (max-width: 768px) {
+  :root { --nav-h: 56px; }
+
+  .nav { padding:0 1rem; }
+  .nav-links { display:none; }
+  .nav-actions .nav-logout { display:none; }
+  .nav-hamburger { display:flex; }
+
+  .page-container { padding:calc(var(--nav-h) + 1.25rem) 1rem 2rem; }
+  .page-header { grid-template-columns:1fr; }
+  .page-header-actions { flex-wrap:wrap; }
+
+  .stats-grid { grid-template-columns:repeat(3,1fr); gap:8px; }
+  .stat-card-value { font-size:1.3rem; }
+
+  .level-grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); gap:8px; }
+
+  .game-container { padding:calc(var(--nav-h) + 1rem) 1rem 1.5rem; }
+  .game-topbar { grid-template-columns:1fr auto; }
+  .game-topbar .game-progress-wrap { grid-column:1/-1; grid-row:2; }
+
+  .live-stats-bar { grid-template-columns:repeat(4,1fr); gap:6px; }
+  .live-stat-val  { font-size:1.1rem; }
+
+  .arabic-ref { font-size:1.2rem; }
+  .typing-display { font-size:1.1rem; }
+
+  .game-controls { flex-direction:column; align-items:stretch; }
+  .game-controls-left  { justify-content:center; }
+  .game-controls-right { justify-content:center; }
+
+  .lb-row { grid-template-columns:32px 1fr 60px 60px; }
+  .lb-row > :last-child { display:none; }
+  .lb-table-header { grid-template-columns:32px 1fr 60px 60px; }
+  .lb-table-header > :last-child { display:none; }
+
+  .lb-podium { gap:8px; }
+
+  .form-row { grid-template-columns:1fr; }
+  .difficulty-grid { grid-template-columns:1fr 1fr 1fr; }
+
+  .profile-top { gap:1rem; }
+  .profile-avatar { width:72px; height:72px; font-size:1.4rem; }
+
+  .achievements-grid { grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); }
+
+  .toast { min-width:220px; }
+  #toastContainer { right:1rem; bottom:1rem; }
+
+  .auth-stats { padding:0.75rem 1rem; gap:1rem; }
+  .logo-text   { font-size:2.2rem; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns:repeat(2,1fr); }
+  .live-stats-bar { grid-template-columns:repeat(2,1fr); }
+
+  .lb-row { grid-template-columns:28px 1fr 52px; }
+  .lb-row > :nth-child(4) { display:none; }
+  .lb-table-header { grid-template-columns:28px 1fr 52px; }
+  .lb-table-header > :nth-child(4) { display:none; }
+
+  .result-stats { grid-template-columns:1fr 1fr; }
+
+  .game-topbar { gap:0.75rem; }
+  .timer-ring  { width:64px; height:64px; }
+  .timer-text  { font-size:0.95rem; }
+
+  .page-header-text h2 { font-size:1.3rem; }
+}
+
+@media (max-width: 360px) {
+  .level-grid { grid-template-columns:repeat(auto-fill,minmax(60px,1fr)); }
+  .difficulty-grid { grid-template-columns:1fr; }
+}
+
+/* ---- PRINT ---- */
+@media print {
+  .nav, .bg-ambient, #toastContainer, .modal-overlay { display:none !important; }
+  .page-container { padding-top:1rem; }
+}
