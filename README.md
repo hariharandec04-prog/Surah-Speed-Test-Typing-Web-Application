@@ -1,16 +1,24 @@
-# Student Task Management System
-A full-stack task management app built with Java, MySQL, HTML5, CSS3, and JDBC.
+Surah Speed Test
+A responsive single-page typing application for testing and improving your typing speed using Quranic Surahs.
+Features
 
-## Features
-- Full CRUD for assignments and deadlines
-- OOP-based Java backend
-- 3NF normalized MySQL schema
-- JDBC database connection
+5+ progressive difficulty levels
+Real-time WPM & accuracy tracking
+Under 50ms keystroke response time
+Backend-free user authentication via EmailJS
+Persistent leaderboard & session tracking via LocalStorage
 
-## Tech Stack
-Java · MySQL · HTML5 · CSS3 · JDBC
+Tech Stack
+HTML5 · CSS3 · JavaScript (ES6) · EmailJS API · LocalStorage
+Setup
 
-## Setup
-1. Clone the repo
-2. Configure DB in `config.java`
-3. Run `Main.java`
+Clone the repo
+Add your EmailJS credentials in config.js
+Open index.html in your browser
+
+Usage
+
+Register/login with email verification
+Select difficulty level
+Start typing and track your WPM
+View leaderboard and personal progress
